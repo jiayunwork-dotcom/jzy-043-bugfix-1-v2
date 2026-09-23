@@ -232,12 +232,17 @@ func (s *Store) RetryDead(ctx context.Context, ids []string) ([]*domain.Task, in
 				return err
 			}
 			moved = append(moved, t)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		for _, t := range moved {
 			if err := writeAudit(ctx, tx, "task", t.ID, "dead_retry", "dead", "ready", "api",
 				"dead letter manually re-enqueued"); err != nil {
 				return err
 			}
 		}
-		return rows.Err()
+		return nil
 	})
 	return moved, len(moved), err
 }

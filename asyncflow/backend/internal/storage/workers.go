@@ -90,7 +90,7 @@ func (s *Store) DeleteWorker(ctx context.Context, id string) error {
 
 // GetWorker fetches one worker.
 func (s *Store) GetWorker(ctx context.Context, id string) (*domain.Worker, error) {
-	row := s.pool.QueryRow(ctx, workerColumns+` FROM workers WHERE id=$1`, id)
+	row := s.pool.QueryRow(ctx, `SELECT `+workerColumns+` FROM workers WHERE id=$1`, id)
 	w, err := scanWorker(row)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func (s *Store) GetWorker(ctx context.Context, id string) (*domain.Worker, error
 
 // ListWorkers returns all workers including offline ones.
 func (s *Store) ListWorkers(ctx context.Context) ([]*domain.Worker, error) {
-	rows, err := s.pool.Query(ctx, workerColumns+
+	rows, err := s.pool.Query(ctx, `SELECT `+workerColumns+
 		` FROM workers ORDER BY status, last_heartbeat DESC`)
 	if err != nil {
 		return nil, err
